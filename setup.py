@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'name' :'TR500HTTP',
+    'name' :'devicewise',
     'version':'1.0',
     'description' : 'Sample code for communicating with the Telit IoT Platform via Python.',
     'author' : 'Telit',
