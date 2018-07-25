@@ -73,6 +73,21 @@ class TR50httpWorker(TR50http.TR50http):
         result = self.execute("email.send", params)
         return (result == True and self.response["data"]["success"])
 
+    # file.get : Reserves a file handle for a given file to be obtained via HTTP GET
+    # @param     string    file_name      The name of the file to be retrieved from the M2M Service.
+    # @param     string    thing_key      The Thing associated with the file. Defaults to the current session's Thing.
+    # @param     bool      global_file    If set to true, the file is a global file and the thingKey parameter will be ignored.
+    # @return    mixed     Returns a dict with the fileId, fileSize and rcr32 or the failure code
+    def file_get(self, file_name, thing_key, global_file):
+        """This command reserves a file handle for a given file to be obtained via HTTP GET"""
+        params = { "fileName" : file_name, "global" : global_file }
+        if global_file == False:
+            params["thingKey"] = thing_key
+        result = self.execute("file.get", params)
+        if result == True and self.response["data"]["success"] == True:
+            return self.response["data"]["params"]
+        else:
+            return self.response["data"]["success"]
 
     # locale.get : This command is used to retrieve the current session's locale.
     # @return    mixed    Returns the dict of the session's locale on success, or the failure code.
