@@ -73,6 +73,51 @@ class TR50httpWorker(TR50http.TR50http):
         result = self.execute("email.send", params)
         return (result == True and self.response["data"]["success"])
 
+    # file.put : Reserves a file handle to be used to upload a file via HTTP POST
+    # @param     string    file_name       The name of the file to be uploaded to the platform.
+    # @param     string    thing_key       The Thing that the file will be attached to.
+    # @param     bool      global_file     If set to true, the file will be a global file and the thingKey parameter will be ignored. Defaults to false.
+    # @param     bool      public          If true, identifies the file as publicly accessible outside of the organization. If false, the file is private to the organization. Defaults to false.
+    # @param     int       crc32           A IEEE CRC32 checksum of the file to be uploaded. When the file is subsequently sent via the HTTP interface, the checksum will be validated, and if incorrect, the file will be discarded an an error returned.
+    # @param     mixed     tags            A list of tags to associate to the file.
+    # @param     mixed     sec_tags        A list of tags to specify security access to the file.
+    # @param     int       ttl             Specify an expect ttl (in seconds) for a file. If a file is uploaded partially and a ttl is set, partial file will be deleted after elapsed time.
+    # @param     bool      log_complete    If set to true, creates an event log entry when the file upload is complete.
+    # @return    mixed     Returns a dict with the fileId or the failure code
+    def file_put(self, file_name, thing_key, global_file, public, crc32, tags, sec_tags, ttl, log_complete):
+        """This command reserves a file handle to be used to upload a file via HTTP POST"""
+        params = { "fileName" : file_name, "global" : global_file}
+        if global_file == False:
+            params["thingKey"] = thing_key
+
+        if public:
+            params["public"] = public
+
+        if type(tags) is list:
+            params["tags"] = tags
+        else:
+            params["tags"] = [ tags ]
+
+        if type(sec_tags) is list:
+            params["secTags"] = sec_tags
+        else:
+            params["secTags"] = [ sec_tags ]
+
+        if log_complete:
+            params["logComplete"] = log_complete
+
+        if crc32 != False:
+            params["crc32"] = crc32
+
+        if ttl != False:
+            params["ttl"] = ttl
+
+        result = self.execute("file.put", params)
+        if result == True and self.response["data"]["success"] == True:
+            return self.response["data"]["params"]
+        else:
+            return self.response["data"]["success"]
+
     # file.get : Reserves a file handle for a given file to be obtained via HTTP GET
     # @param     string    file_name      The name of the file to be retrieved from the M2M Service.
     # @param     string    thing_key      The Thing associated with the file. Defaults to the current session's Thing.
